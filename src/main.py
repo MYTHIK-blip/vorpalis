@@ -1,12 +1,8 @@
-import sys
-import os
-
-# Allow Python to find the 'agents' directory
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from agents.vorpalis_agent import run_agent
+from feedloop import generate_prompt, save_prompt
 
 if __name__ == "__main__":
-    print("🧠 VORPALIS AGENT BOOTING...")
-    run_agent()
+    print("🧠 VORPALIS Manual Boot: Generating one drop...")
+    prompt = generate_prompt()
+    save_prompt(prompt)
+    print("✅ Drop complete.")
 

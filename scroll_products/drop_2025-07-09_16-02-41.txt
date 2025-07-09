@@ -1,0 +1,20 @@
+📦 VORPALIS PRODUCT DROP [2025-07-09_16-02-19]
+
+🔥 HuggingFace Models:
+- Falconsai/nsfw_image_detection - ['transformers', 'pytorch', 'safetensors', 'vit', 'image-classification', 'arxiv:2010.11929', 'license:apache-2.0', 'autotrain_compatible', 'endpoints_compatible', 'region:us']
+- sentence-transformers/all-MiniLM-L6-v2 - ['sentence-transformers', 'pytorch', 'tf', 'rust', 'onnx', 'safetensors', 'openvino', 'bert', 'feature-extraction', 'sentence-similarity', 'transformers', 'en', 'dataset:s2orc', 'dataset:flax-sentence-embeddings/stackexchange_xml', 'dataset:ms_marco', 'dataset:gooaq', 'dataset:yahoo_answers_topics', 'dataset:code_search_net', 'dataset:search_qa', 'dataset:eli5', 'dataset:snli', 'dataset:multi_nli', 'dataset:wikihow', 'dataset:natural_questions', 'dataset:trivia_qa', 'dataset:embedding-data/sentence-compression', 'dataset:embedding-data/flickr30k-captions', 'dataset:embedding-data/altlex', 'dataset:embedding-data/simple-wiki', 'dataset:embedding-data/QQP', 'dataset:embedding-data/SPECTER', 'dataset:embedding-data/PAQ_pairs', 'dataset:embedding-data/WikiAnswers', 'arxiv:1904.06472', 'arxiv:2102.07033', 'arxiv:2104.08727', 'arxiv:1704.05179', 'arxiv:1810.09305', 'license:apache-2.0', 'autotrain_compatible', 'text-embeddings-inference', 'endpoints_compatible', 'region:us']
+- dima806/fairface_age_image_detection - ['transformers', 'safetensors', 'vit', 'image-classification', 'dataset:nateraw/fairface', 'base_model:google/vit-base-patch16-224-in21k', 'base_model:finetune:google/vit-base-patch16-224-in21k', 'license:apache-2.0', 'autotrain_compatible', 'endpoints_compatible', 'region:us']
+- timm/mobilenetv3_small_100.lamb_in1k - ['timm', 'pytorch', 'safetensors', 'image-classification', 'transformers', 'dataset:imagenet-1k', 'arxiv:2110.00476', 'arxiv:1905.02244', 'license:apache-2.0', 'region:us']
+- google-bert/bert-base-uncased - ['transformers', 'pytorch', 'tf', 'jax', 'rust', 'coreml', 'onnx', 'safetensors', 'bert', 'fill-mask', 'exbert', 'en', 'dataset:bookcorpus', 'dataset:wikipedia', 'arxiv:1810.04805', 'license:apache-2.0', 'autotrain_compatible', 'endpoints_compatible', 'region:us']
+
+🚀 GitHub Stacks:
+- netdata/netdata - ⭐ 75003
+- fastapi/full-stack-fastapi-template - ⭐ 34395
+- jina-ai/serve - ⭐ 21640
+- louislam/dockge - ⭐ 18557
+- deviantony/docker-elk - ⭐ 17946
+
+🌀 Prompt Idea:
+> How can we remix these into passive-income agents or scroll kits for resale?
+
+🧪 Your move, scrollsmith.
