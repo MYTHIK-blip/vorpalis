@@ -2,45 +2,63 @@
 
 import argparse
 import time
-from datetime import datetime
-from agents.vectr import export_scroll
-from src.llm.mistralon import query_mistral
+from agents.loomx import run_loom
+from agents.packr import PACKRAgent
+from agents.obliv import OBLIVAgent
 
-# Optional: future modules
-# from agents.loomx import loom_trigger
-# from scrollsync.glyphx import route_output
-# from memory.arkive import log_context
+# ────── Agent Manifest ──────
+AGENT_MANIFEST = {
+    "VECTR": "Export scroll products (.txt/.md/.pdf)",
+    "LOOMX": "Generate & package prompts via LLM",
+    "PACKR": "Bundle products into ZIP archives",
+    "OBLIV": "Inventory and manifest products"
+}
 
-def generate_prompt_pack():
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    return f"Generate 5 startup tools using AI for mental resilience. Time: {now}"
+def show_manifest():
+    print("📜 Agent Manifest:")
+    for name, desc in AGENT_MANIFEST.items():
+        print(f" • {name}: {desc}")
+    print()
 
-def run_once():
-    prompt = generate_prompt_pack()
-    print(f"\n🧠 Prompt: {prompt}\n")
+# ────── Single Run ──────
+def run_once(topic: str):
+    print(f"\n🧪 Running pipeline for topic: {topic}\n")
+    show_manifest()
 
-    response = query_mistral(prompt)
+    # 1) Generate + export scroll via LOOMX (which calls VECTR internally)
+    run_loom(topic)
 
-    scroll_title = "Mistral Prompt Pack"
-    export_scroll(scroll_title, response)
+    # 2) Bundle everything in scroll_products/
+    packr = PACKRAgent()
+    bundle_path = packr.create_bundle(bundle_name=f"{topic.replace(' ','_')}_bundle")
 
-def run_loop(interval_seconds=600):
-    print(f"♻️ Looping every {interval_seconds} seconds...")
+    # 3) Update and display inventory
+    obliv = OBLIVAgent()
+    inventory_path = obliv.save_inventory()
+    obliv.show_inventory()
+
+    print(f"\n✅ Pipeline complete!\n  • Bundle: {bundle_path}\n  • Inventory: {inventory_path}\n")
+
+# ────── Loop Mode ──────
+def run_loop(topic: str, interval: int):
+    print(f"♻️ Starting continuous mode for '{topic}' every {interval}s\n")
     try:
         while True:
-            run_once()
-            time.sleep(interval_seconds)
+            run_once(topic)
+            time.sleep(interval)
     except KeyboardInterrupt:
-        print("\n🛑 Scrollloop interrupted.")
+        print("\n🛑 Loop interrupted by user.")
 
+# ────── CLI Entrypoint ──────
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run VORPALIS")
-    parser.add_argument('--loop', action='store_true', help="Run in scrollloop mode")
-    parser.add_argument('--interval', type=int, default=600, help="Loop interval in seconds")
+    parser = argparse.ArgumentParser(description="VORPALIS Digital Forge Orchestrator")
+    parser.add_argument('--topic', '-t', default="wellness", help="Topic for scroll generation")
+    parser.add_argument('--loop', '-l', action='store_true', help="Run continuously")
+    parser.add_argument('--interval', '-i', type=int, default=600, help="Loop interval in seconds")
     args = parser.parse_args()
 
     if args.loop:
-        run_loop(args.interval)
+        run_loop(args.topic, args.interval)
     else:
-        run_once()
+        run_once(args.topic)
 
