@@ -1,48 +1,41 @@
 import os
-import requests
-import json
 from datetime import datetime
-from src.feedloop import generate_feed_summary
-from config import settings
-from memory import context_store
+from llm.mistralon import query_model  # ensure this function returns a string
 
 class VECTRAgent:
-    def __init__(self):
+    """
+    VECTR: Uses an LLM to generate product/marketing scrolls
+    and saves them into scroll_products/.
+    """
+
+    def __init__(self,
+                 output_dir="scroll_products"):
         self.name = "VECTR"
-        self.description = "Market scanner and prompt packager"
-        self.scan_endpoint = "https://huggingface.co/api/models?sort=downloads"
+        self.output_dir = output_dir
+        os.makedirs(self.output_dir, exist_ok=True)
 
-    def scan_online_assets(self, limit=10):
-        print(f"[{self.name}] Scanning Hugging Face for top {limit} models...")
-        try:
-            response = requests.get(self.scan_endpoint)
-            data = response.json()[:limit]
-            entries = [{"name": d["modelId"], "downloads": d["downloads"]} for d in data]
-            self.log(entries)
-            return entries
-        except Exception as e:
-            print(f"[{self.name}] Error: {e}")
-            return []
+    def run(self, topic: str = "default") -> str:
+        """
+        Send a prompt to the LLM, save the response as a markdown scroll.
+        Returns the path to the saved file.
+        """
+        prompt = f"Generate 10 product ideas and marketing prompts for: {topic}"
+        print(f"[{self.name}] Prompting LLM → {prompt}")
+        response = query_model(prompt)
 
-    def package_prompts(self, model_name):
-        prompt = f"Generate 20 useful prompts for model: {model_name}"
-        result = generate_feed_summary(prompt)
-        filename = f"scroll_products/{model_name}_prompts.txt"
-        with open(filename, "w") as f:
-            f.write(result)
-        print(f"[{self.name}] Prompt scroll saved → {filename}")
-        return filename
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe = topic.replace(" ", "_")
+        filename = f"{safe}_{ts}.md"
+        path = os.path.join(self.output_dir, filename)
 
-    def log(self, data):
-        ts = datetime.utcnow().isoformat()
-        path = "logs/vectr.echo.md"
-        with open(path, "a") as log:
-            log.write(f"## [{ts}] {self.description}\n")
-            log.write(json.dumps(data, indent=2) + "\n\n")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(response)
+        print(f"[{self.name}] Saved scroll → {path}")
+        return path
 
 if __name__ == "__main__":
+    import sys
+    topic = sys.argv[1] if len(sys.argv) > 1 else "default"
     agent = VECTRAgent()
-    top_models = agent.scan_online_assets()
-    if top_models:
-        agent.package_prompts(top_models[0]["name"])
+    agent.run(topic)
 

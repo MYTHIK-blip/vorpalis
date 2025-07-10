@@ -1,64 +1,56 @@
-# src/main.py
+import os
+import sys
+import shutil
 
-import argparse
-import time
-from agents.loomx import run_loom
-from agents.packr import PACKRAgent
+# ─ Ensure repo root on path for `import agents` ───────────────────
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+
+from agents.loomx import LOOMXAgent
+from agents.vectr import VECTRAgent
 from agents.obliv import OBLIVAgent
+from agents.packr import PACKRAgent
 
-# ────── Agent Manifest ──────
-AGENT_MANIFEST = {
-    "VECTR": "Export scroll products (.txt/.md/.pdf)",
-    "LOOMX": "Generate & package prompts via LLM",
-    "PACKR": "Bundle products into ZIP archives",
-    "OBLIV": "Inventory and manifest products"
-}
+def main(topic="civic tech"):
+    print(f"[MAIN] Starting pipeline for topic: {topic}\n")
 
-def show_manifest():
-    print("📜 Agent Manifest:")
-    for name, desc in AGENT_MANIFEST.items():
-        print(f" • {name}: {desc}")
-    print()
+    # 1) Scan local scroll memory
+    loomx      = LOOMXAgent()
+    entries    = loomx.run(topic)
 
-# ────── Single Run ──────
-def run_once(topic: str):
-    print(f"\n🧪 Running pipeline for topic: {topic}\n")
-    show_manifest()
+    # 2) Generate new scroll via LLM
+    vectr      = VECTRAgent()
+    scroll_md  = vectr.run(topic)
 
-    # 1) Generate + export scroll via LOOMX (which calls VECTR internally)
-    run_loom(topic)
+    # 3) Inventory current scroll products
+    obliv      = OBLIVAgent()
+    inventory  = obliv.run(topic)
 
-    # 2) Bundle everything in scroll_products/
-    packr = PACKRAgent()
-    bundle_path = packr.create_bundle(bundle_name=f"{topic.replace(' ','_')}_bundle")
+    # 4) Bundle all scroll products + manifest
+    packr      = PACKRAgent()
+    bundle_zip = packr.create_bundle(topic)
 
-    # 3) Update and display inventory
-    obliv = OBLIVAgent()
-    inventory_path = obliv.save_inventory()
-    obliv.show_inventory()
+    # 5) Export ready-to-sell package
+    out_dir = os.path.abspath("products_ready")
+    os.makedirs(out_dir, exist_ok=True)
 
-    print(f"\n✅ Pipeline complete!\n  • Bundle: {bundle_path}\n  • Inventory: {inventory_path}\n")
+    # copy the main bundle + its manifest
+    manifest  = bundle_zip.replace(".zip", ".yaml")
+    for f in (bundle_zip, manifest, scroll_md):
+        dest = os.path.join(out_dir, os.path.basename(f))
+        shutil.copy(f, dest)
+    print(f"\n[MAIN] Published to → {out_dir}")
 
-# ────── Loop Mode ──────
-def run_loop(topic: str, interval: int):
-    print(f"♻️ Starting continuous mode for '{topic}' every {interval}s\n")
-    try:
-        while True:
-            run_once(topic)
-            time.sleep(interval)
-    except KeyboardInterrupt:
-        print("\n🛑 Loop interrupted by user.")
+    # Summary
+    print("\n[MAIN] Pipeline complete:")
+    print(f"  • Memory entries: {len(entries)}")
+    print(f"  • Scroll output:  {scroll_md}")
+    print(f"  • Inventory:      {inventory}")
+    print(f"  • Bundle ZIP:     {bundle_zip}")
+    print(f"  • Manifest YAML:  {manifest}")
 
-# ────── CLI Entrypoint ──────
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="VORPALIS Digital Forge Orchestrator")
-    parser.add_argument('--topic', '-t', default="wellness", help="Topic for scroll generation")
-    parser.add_argument('--loop', '-l', action='store_true', help="Run continuously")
-    parser.add_argument('--interval', '-i', type=int, default=600, help="Loop interval in seconds")
-    args = parser.parse_args()
-
-    if args.loop:
-        run_loop(args.topic, args.interval)
-    else:
-        run_once(args.topic)
+    topic = sys.argv[1] if len(sys.argv) > 1 else "civic tech"
+    main(topic)
 
